@@ -17,7 +17,7 @@ function App() {
       ></div>
       <div className="relative z-10 max-w-6xl mx-auto p-8">
         <h1 className="text-5xl font-bold mb-8 text-center text-shadow text-purple-300">
-          Deezer Music Player
+          BurningHat Music Player
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
