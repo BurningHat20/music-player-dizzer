@@ -12,8 +12,8 @@ function VolumeControl() {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <FaVolumeDown className="text-gray-400" />
+    <div className="flex items-center space-x-1 sm:space-x-2">
+      <FaVolumeDown className="text-gray-400 text-xs sm:text-base" />
       <input
         type="range"
         min="0"
@@ -21,9 +21,9 @@ function VolumeControl() {
         step="0.01"
         value={volume}
         onChange={handleVolumeChange}
-        className="w-24 accent-purple-500"
+        className="w-16 sm:w-24 accent-purple-500"
       />
-      <FaVolumeUp className="text-gray-400" />
+      <FaVolumeUp className="text-gray-400 text-xs sm:text-base" />
     </div>
   );
 }
