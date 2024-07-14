@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentTrack,
   setIsPlaying,
@@ -7,6 +7,7 @@ import {
   searchTracks,
 } from "../store/playerSlice";
 import { FaPlay, FaPlus } from "react-icons/fa";
+import SongMenu from "./SongMenu";
 
 const getRandomColor = () => {
   const colors = [
@@ -20,18 +21,8 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-function SongCard({ track }) {
-  const dispatch = useDispatch();
+function SongCard({ track, onPlay, onAddToPlaylist, onOpenMenu }) {
   const bgColor = getRandomColor();
-
-  const handlePlay = () => {
-    dispatch(setCurrentTrack(track));
-    dispatch(setIsPlaying(true));
-  };
-
-  const handleAddToPlaylist = () => {
-    dispatch(addToPlaylist(track));
-  };
 
   return (
     <div
@@ -40,18 +31,19 @@ function SongCard({ track }) {
       <img
         src={track.album.cover_medium}
         alt={track.title}
-        className="w-full h-40 sm:h-48 object-cover"
+        className="w-full h-40 sm:h-48 object-cover cursor-pointer"
+        onClick={() => onOpenMenu(track)}
       />
       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
-          onClick={handlePlay}
+          onClick={() => onPlay(track)}
           className="p-2 sm:p-3 bg-green-500 rounded-full text-white mr-2 transform transition-transform duration-300 hover:scale-110"
           aria-label="Play"
         >
           <FaPlay className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
         <button
-          onClick={handleAddToPlaylist}
+          onClick={() => onAddToPlaylist(track)}
           className="p-2 sm:p-3 bg-white text-black rounded-full transform transition-transform duration-300 hover:scale-110"
           aria-label="Add to playlist"
         >
@@ -70,15 +62,16 @@ function SongCard({ track }) {
 
 function Home() {
   const dispatch = useDispatch();
+  const { currentTrack, isPlaying } = useSelector((state) => state.player);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedTrack, setSelectedTrack] = useState(null);
 
   useEffect(() => {
     const fetchTracks = async () => {
       setLoading(true);
       try {
-        // Fetch top charts or a specific genre
         const result = await dispatch(searchTracks("top charts")).unwrap();
         setTracks(result);
         setLoading(false);
@@ -91,6 +84,27 @@ function Home() {
     fetchTracks();
   }, [dispatch]);
 
+  const handlePlayTrack = (track) => {
+    dispatch(setCurrentTrack(track));
+    dispatch(setIsPlaying(true));
+  };
+
+  const handlePauseTrack = () => {
+    dispatch(setIsPlaying(false));
+  };
+
+  const handleAddToPlaylist = (track) => {
+    dispatch(addToPlaylist(track));
+  };
+
+  const handleOpenMenu = (track) => {
+    setSelectedTrack(track);
+  };
+
+  const handleCloseMenu = () => {
+    setSelectedTrack(null);
+  };
+
   if (loading)
     return <div className="text-center text-purple-300">Loading...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
@@ -102,9 +116,25 @@ function Home() {
       </h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
         {tracks.slice(0, 10).map((track) => (
-          <SongCard key={track.id} track={track} />
+          <SongCard
+            key={track.id}
+            track={track}
+            onPlay={handlePlayTrack}
+            onAddToPlaylist={handleAddToPlaylist}
+            onOpenMenu={handleOpenMenu}
+          />
         ))}
       </div>
+      {selectedTrack && (
+        <SongMenu
+          track={selectedTrack}
+          isPlaying={isPlaying && currentTrack.id === selectedTrack.id}
+          onPlay={() => handlePlayTrack(selectedTrack)}
+          onPause={handlePauseTrack}
+          onAddToPlaylist={() => handleAddToPlaylist(selectedTrack)}
+          onClose={handleCloseMenu}
+        />
+      )}
     </div>
   );
 }

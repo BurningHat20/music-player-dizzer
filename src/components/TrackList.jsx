@@ -1,4 +1,5 @@
-import React from "react";
+// TrackList.jsx
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setCurrentTrack,
@@ -6,11 +7,15 @@ import {
   addToPlaylist,
 } from "../store/playerSlice";
 import { FaPlay, FaPlus } from "react-icons/fa";
+import SongMenu from "./SongMenu";
 
-function TrackListItem({ track, onPlay, onAddToPlaylist }) {
+function TrackListItem({ track, onPlay, onAddToPlaylist, onOpenMenu }) {
   return (
     <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg mb-2 hover:bg-gray-700 transition-colors duration-200">
-      <div className="flex items-center">
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={() => onOpenMenu(track)}
+      >
         <img
           src={track.album.cover_small}
           alt={track.title}
@@ -42,18 +47,30 @@ function TrackListItem({ track, onPlay, onAddToPlaylist }) {
 }
 
 function TrackList() {
-  const { searchResults, loading, error } = useSelector(
-    (state) => state.player
-  );
+  const { searchResults, loading, error, currentTrack, isPlaying } =
+    useSelector((state) => state.player);
   const dispatch = useDispatch();
+  const [selectedTrack, setSelectedTrack] = useState(null);
 
   const handlePlayTrack = (track) => {
     dispatch(setCurrentTrack(track));
     dispatch(setIsPlaying(true));
   };
 
+  const handlePauseTrack = () => {
+    dispatch(setIsPlaying(false));
+  };
+
   const handleAddToPlaylist = (track) => {
     dispatch(addToPlaylist(track));
+  };
+
+  const handleOpenMenu = (track) => {
+    setSelectedTrack(track);
+  };
+
+  const handleCloseMenu = () => {
+    setSelectedTrack(null);
   };
 
   if (loading)
@@ -77,9 +94,20 @@ function TrackList() {
               track={track}
               onPlay={handlePlayTrack}
               onAddToPlaylist={handleAddToPlaylist}
+              onOpenMenu={handleOpenMenu}
             />
           ))}
         </div>
+      )}
+      {selectedTrack && (
+        <SongMenu
+          track={selectedTrack}
+          isPlaying={isPlaying && currentTrack.id === selectedTrack.id}
+          onPlay={() => handlePlayTrack(selectedTrack)}
+          onPause={handlePauseTrack}
+          onAddToPlaylist={() => handleAddToPlaylist(selectedTrack)}
+          onClose={handleCloseMenu}
+        />
       )}
     </div>
   );
