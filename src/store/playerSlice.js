@@ -1,18 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const initialState = {
-  currentTrack: null,
-  isPlaying: false,
-  volume: 0.5,
-  progress: 0,
-  duration: 0,
-  searchResults: [],
-  playlist: [],
-  loading: false,
-  error: null,
-};
-
+// This creates and exports the searchTracks action
 export const searchTracks = createAsyncThunk(
   'player/searchTracks',
   async (query) => {
@@ -30,6 +19,18 @@ export const searchTracks = createAsyncThunk(
     return response.data.data;
   }
 );
+
+const initialState = {
+  currentTrack: null,
+  isPlaying: false,
+  volume: 0.5,
+  progress: 0,
+  duration: 0,
+  searchResults: [],
+  playlist: [],
+  loading: false,
+  error: null,
+};
 
 const playerSlice = createSlice({
   name: 'player',
@@ -87,5 +88,6 @@ export const {
   clearPlaylist,
 } = playerSlice.actions;
 
+// No need to export searchTracks here, as it's already exported at the top
 
 export default playerSlice.reducer;

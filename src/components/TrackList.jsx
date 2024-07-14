@@ -7,6 +7,40 @@ import {
 } from "../store/playerSlice";
 import { FaPlay, FaPlus } from "react-icons/fa";
 
+function TrackListItem({ track, onPlay, onAddToPlaylist }) {
+  return (
+    <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg mb-2 hover:bg-gray-700 transition-colors duration-200">
+      <div className="flex items-center">
+        <img
+          src={track.album.cover_small}
+          alt={track.title}
+          className="w-12 h-12 rounded-md mr-4"
+        />
+        <div>
+          <h3 className="font-semibold text-gray-100">{track.title}</h3>
+          <p className="text-sm text-gray-400">{track.artist.name}</p>
+        </div>
+      </div>
+      <div className="flex space-x-2">
+        <button
+          onClick={() => onPlay(track)}
+          className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors duration-200"
+          aria-label="Play track"
+        >
+          <FaPlay className="text-white" />
+        </button>
+        <button
+          onClick={() => onAddToPlaylist(track)}
+          className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors duration-200"
+          aria-label="Add to playlist"
+        >
+          <FaPlus className="text-white" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function TrackList() {
   const { searchResults, loading, error } = useSelector(
     (state) => state.player
@@ -27,39 +61,26 @@ function TrackList() {
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
-    <div className="mb-8">
-      {searchResults.map((track) => (
-        <div
-          key={track.id}
-          className="flex items-center justify-between bg-transparent-dark bg-opacity-50 p-4 rounded-lg shadow mb-4 hover:bg-opacity-75 transition-all duration-200"
-        >
-          <div className="flex items-center">
-            <img
-              src={track.album.cover_small}
-              alt={track.title}
-              className="w-12 h-12 mr-4 rounded"
+    <div className="space-y-4">
+      <h2 className="text-2xl font-semibold text-purple-300 mb-4">
+        Search Results
+      </h2>
+      {searchResults.length === 0 ? (
+        <p className="text-gray-400">
+          No tracks found. Try searching for something!
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {searchResults.map((track) => (
+            <TrackListItem
+              key={track.id}
+              track={track}
+              onPlay={handlePlayTrack}
+              onAddToPlaylist={handleAddToPlaylist}
             />
-            <div>
-              <h3 className="font-semibold text-purple-300">{track.title}</h3>
-              <p className="text-gray-400">{track.artist.name}</p>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => handlePlayTrack(track)}
-              className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors duration-200"
-            >
-              <FaPlay />
-            </button>
-            <button
-              onClick={() => handleAddToPlaylist(track)}
-              className="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full transition-colors duration-200"
-            >
-              <FaPlus />
-            </button>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }

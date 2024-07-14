@@ -1,34 +1,83 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import TrackList from "./components/TrackList";
 import Player from "./components/Player";
 import Playlist from "./components/Playlist";
+import Home from "./components/Home";
+import { FaSearch, FaListUl, FaHome, FaMusic, FaBars } from "react-icons/fa";
 
 function App() {
+  const [activeTab, setActiveTab] = useState("home");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-black text-gray-100 relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')",
-          backgroundBlendMode: "multiply",
-        }}
-      ></div>
-      <div className="relative z-10 max-w-6xl mx-auto p-8">
-        <h1 className="text-5xl font-bold mb-8 text-center text-shadow text-purple-300">
-          BurningHat Music Player
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <SearchBar />
-            <TrackList />
+    <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
+      {/* Mobile header */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-gray-800">
+        <FaMusic className="text-purple-400 text-2xl" />
+        <button onClick={toggleSidebar} className="text-white">
+          <FaBars size={24} />
+        </button>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div
+          className={`${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:relative z-30 w-64 bg-gray-800 h-full transition-transform duration-300 ease-in-out`}
+        >
+          <div className="p-4 text-center">
+            <FaMusic className="text-purple-400 text-2xl mx-auto mb-2" />
+            <h1 className="text-xl font-bold text-purple-400">BurningHat</h1>
+            <h2 className="text-xs text-gray-400 mt-1">Music Player</h2>
           </div>
-          <div>
-            <Playlist />
-          </div>
+          <nav className="mt-8">
+            <ul className="space-y-2">
+              {[
+                { id: "home", icon: FaHome, label: "Home" },
+                { id: "search", icon: FaSearch, label: "Search" },
+                { id: "playlist", icon: FaListUl, label: "Playlist" },
+              ].map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsSidebarOpen(false);
+                    }}
+                    className={`w-full flex items-center p-2 text-base font-normal rounded-lg ${
+                      activeTab === item.id
+                        ? "bg-gray-700"
+                        : "hover:bg-gray-700"
+                    }`}
+                  >
+                    <item.icon className="w-6 h-6" />
+                    <span className="ml-3">{item.label}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-4">
+            {activeTab === "home" && <Home />}
+            {activeTab === "search" && (
+              <div>
+                <SearchBar />
+                <TrackList />
+              </div>
+            )}
+            {activeTab === "playlist" && <Playlist />}
+          </main>
         </div>
       </div>
+
+      {/* Player */}
       <Player />
     </div>
   );

@@ -37,21 +37,16 @@ function SearchBar() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-8">
-      <div className="flex items-center bg-transparent-dark rounded-full p-2">
+    <form onSubmit={handleSubmit} className="mb-6">
+      <div className="relative">
         <input
-          className="appearance-none bg-transparent border-none w-full text-gray-100 mr-3 py-1 px-2 leading-tight focus:outline-none placeholder-gray-400"
+          className="w-full bg-gray-800 text-white border border-gray-700 rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-purple-500"
           type="text"
           placeholder="Search for tracks..."
           value={query}
           onChange={handleInputChange}
         />
-        <button
-          className="flex-shrink-0 bg-light-purple hover:bg-purple-700 border-light-purple hover:border-purple-700 text-sm border-4 text-white py-1 px-2 rounded-full"
-          type="submit"
-        >
-          <FaSearch />
-        </button>
+        <FaSearch className="absolute left-3 top-3 text-gray-400" />
       </div>
     </form>
   );
